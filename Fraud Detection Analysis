@@ -1,0 +1,68 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+fd=pd.read_csv("fraud detection.csv")
+
+fd.head()
+
+fd.tail()
+
+fd.describe()
+
+print(fd.isnull())
+
+print(fd.isnull().sum())
+
+print(fd.dtypes)
+
+print(fd.drop_duplicates(inplace=True))
+
+sns.boxplot(x=fd['amount'])
+plt.title('Boxplot of Transaction Amounts')
+plt.show()
+
+selected_features = ['amount', 'oldbalanceOrg', 'newbalanceOrig', 'oldbalanceDest', 'newbalanceDest']
+X = fd[selected_features]
+y = fd['isFraud']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = RandomForestClassifier(random_state=42)
+
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Classification Report:\n", classification_report(y_test, y_pred))
+
+fd_split=fd.iloc[0:12, :]
+print(fd_split)
+
+!pip install --upgrade seaborn
+
+sns.histplot(fd['amount'], bins=30, kde=True)
+plt.show()
+
+sns.boxplot(x=fd['isFraud'], y=fd["amount"])
+plt.xlabel("isFraud")
+plt.ylabel("amount")
+plt.title("Boxplot of transaction amount by fraud status")
+plt.show()
+
+sns.violinplot(x=fd['isFraud'], y=fd['amount'], inner="quartile", palette="Set2")
+plt.title('Violin Plot of Transaction Amounts by Fraud Status')
+plt.show()
+
+sns.countplot(x='type', hue='isFraud', data=fd, palette='viridis')
+plt.title('Distribution of Transaction Types by Fraud Status')
+plt.show()
+
+correlation_matrix = fd.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.show()
